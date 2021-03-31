@@ -37,7 +37,7 @@ public class VirtualMachine {
 
     public void AddAgentAiguilleur(){
         try {
-            AgentController agentController = agentContainer.createNewAgent("Agent_Aiguilleur_"+(id+1),"Agents.AgentAiguilleur",new Object[]{});
+            AgentController agentController = agentContainer.createNewAgent("Agent_Aiguilleur_"+(id+1),"Agents.AgentAiguilleur",new Object[]{this});
             agentController.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,7 +46,7 @@ public class VirtualMachine {
 
     public void AddAgentCompteur(){
         try {
-            AgentController agentController = agentContainer.createNewAgent("Agent_Compteur_"+(id+1),"Agents.AgentCompteur",new Object[]{});
+            AgentController agentController = agentContainer.createNewAgent("Agent_Compteur_"+(id+1),"Agents.AgentCompteur",new Object[]{this});
             agentController.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class VirtualMachine {
 
     public void AddAgentReceveur(){
         try {
-            AgentController agentController = agentContainer.createNewAgent("Agent_Receveur_"+(id+1),"Agents.AgentReceveur",new Object[]{});
+            AgentController agentController = agentContainer.createNewAgent("Agent_Receveur_"+(id+1),"Agents.AgentReceveur",new Object[]{this});
             agentController.start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +64,16 @@ public class VirtualMachine {
 
     public void AddAgentLanceur(){
         try {
-            AgentController agentController = agentContainer.createNewAgent("Agent_Lanceur_"+(id+1),"Agents.AgentLanceur",new Object[]{});
+            AgentController agentController = agentContainer.createNewAgent("Agent_Lanceur_"+(id+1),"Agents.AgentLanceur",new Object[]{this});
+            agentController.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void AddAgentMobile(String typeSourceSearch){
+        try {
+            AgentController agentController = agentContainer.createNewAgent("Agent_Mobile_"+(id+1),"Agents.AgentMobile",new Object[]{id,typeSourceSearch});
             agentController.start();
         } catch (Exception e) {
             e.printStackTrace();
