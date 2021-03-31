@@ -6,6 +6,7 @@ import jade.core.Runtime;
 import jade.util.ExtendedProperties;
 import jade.util.leap.Properties;
 import jade.wrapper.AgentContainer;
+import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
 
 import java.util.ArrayList;
@@ -41,12 +42,13 @@ public class MainContainer {
         network.get(0).pred.add(network.get(3));
         network.get(0).pred.add(network.get(4));
         network.get(0).succ = null;
-
+        network.get(0).addDataSource("Image");
 
         network.get(1).pred.add(network.get(2));
         network.get(1).pred.add(network.get(3));
         network.get(1).pred.add(network.get(4));
         network.get(1).succ = null;
+        network.get(0).addDataSource("Text");
 
         network.get(2).pred.add(network.get(5));
         network.get(2).pred.add(network.get(6));
@@ -71,26 +73,32 @@ public class MainContainer {
 
         network.get(6).succ.add(network.get(2));
         network.get(6).succ.add(network.get(3));
-        network.get(5).pred = null;
+        network.get(6).pred = null;
 
         network.get(7).succ.add(network.get(3));
         network.get(7).succ.add(network.get(4));
-        network.get(5).pred = null;
+        network.get(7).pred = null;
 
         network.get(8).succ.add(network.get(3));
         network.get(8).succ.add(network.get(4));
-        network.get(5).pred = null;
+        network.get(8).pred = null;
 
         startNetwork(network);
     }
 
     public static void startNetwork(ArrayList<VirtualMachine> network){
+
         for (VirtualMachine machine : network){
 
             machine.AddAgentAiguilleur();
             machine.AddAgentCompteur();
+
+            if (machine.getPred() == null)
+                machine.AddAgentLanceur();
+
             if (machine.getSucc() == null)
                 machine.AddAgentReceveur();
+
         }
     }
 }

@@ -17,6 +17,8 @@ public class VirtualMachine {
     AgentContainer agentContainer;
     ArrayList<VirtualMachine> pred;
     ArrayList<VirtualMachine> succ;
+    DataSource dataSource = null;
+
     /*AgentAiguilleur agentAiguilleur=null;
     AgentCompteur agentCompteur=null;
     AgentReceveur agentReceveur=null;*/
@@ -58,6 +60,19 @@ public class VirtualMachine {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void AddAgentLanceur(){
+        try {
+            AgentController agentController = agentContainer.createNewAgent("Agent_Lanceur_"+(id+1),"Agents.AgentLanceur",new Object[]{});
+            agentController.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addDataSource(String type){
+        dataSource = new DataSource(type);
     }
 
     public int getId() {
