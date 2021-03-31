@@ -81,5 +81,16 @@ public class MainContainer {
         network.get(8).succ.add(network.get(4));
         network.get(5).pred = null;
 
+        startNetwork(network);
+    }
+
+    public static void startNetwork(ArrayList<VirtualMachine> network){
+        for (VirtualMachine machine : network){
+
+            machine.AddAgentAiguilleur();
+            machine.AddAgentCompteur();
+            if (machine.getSucc() == null)
+                machine.AddAgentReceveur();
+        }
     }
 }
