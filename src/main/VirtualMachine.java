@@ -84,6 +84,8 @@ public class VirtualMachine {
         dataSource = new DataSource(type);
     }
 
+    public String getDataSource() { return dataSource.getType(); }
+
     public int getId() {
         return id;
     }

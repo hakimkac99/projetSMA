@@ -18,7 +18,6 @@ public class AgentCompteur extends Agent {
         pheromone.put("Image",0);
         pheromone.put("Texte",0);
 
-        System.out.println("Je suis "+getLocalName());
 
         addBehaviour(new CyclicBehaviour() {
             @Override
@@ -33,9 +32,9 @@ public class AgentCompteur extends Agent {
                         //retourner le pheromone
                         ACLMessage reply = msgRec.createReply();
                         reply.setPerformative(ACLMessage.INFORM);
-                        reply.setContent(String.valueOf(pheromone.get(typeSource)));
+                        reply.setContent(String.valueOf(getPheromone(typeSource)));
                         send(reply);
-                        System.out.println(getLocalName()+" : Valeur de phéromone "+pheromone.get(typeSource));
+                        System.out.println(getLocalName()+" : Valeur de phéromone "+getPheromone(typeSource));
                     }else { //Inc ou Dec
 
                     }

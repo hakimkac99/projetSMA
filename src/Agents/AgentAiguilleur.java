@@ -28,23 +28,32 @@ public class AgentAiguilleur extends Agent {
                 //Renvoyer la machine suivante
 
                 ACLMessage msgRec = myAgent.blockingReceive();
+
                 if (msgRec != null) {
                     // Message received. Process it
                     String typeSource = msgRec.getContent();
-                    //ACLMessage reply = msg.createReply();
 
-                    //Contacter les agents compteurs des machines successeurs
+                    String replyMessage = "";
 
-                    String container =  contactCompteurs(typeSource,this);
+                    //Test if this machine is a source machine
+                    if (machine.getSucc()==null){
+                        replyMessage = "Source";
+                        System.out.println(getLocalName()+" : vous etes à la source");
+                    }else {
+                        //Contacter les agents compteurs des machines successeurs
+                        String container = contactCompteurs(typeSource, this);
+                        replyMessage = container;
+                        System.out.println(getLocalName()+" Chemin conseillé : "+container);
+                    }
 
                     //Renvoyer le container avec max pher à l'agent mobile
 
                     ACLMessage reply = msgRec.createReply();
                     reply.setPerformative(ACLMessage.INFORM);
-                    reply.setContent(container);
+                    reply.setContent(replyMessage);
                     send(reply);
 
-                    System.out.println(getLocalName()+" Chemin conseillé : "+container);
+
                 }
                 else{
                     block();
