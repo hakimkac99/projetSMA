@@ -12,6 +12,8 @@ public class AgentCompteur extends Agent {
 
     @Override
     protected void setup() {
+        System.out.println(getLocalName()+" : Début d'exécution");
+
         pheromone = new HashMap<>();
         pheromone.put("Image",0);
         pheromone.put("Texte",0);
@@ -33,7 +35,7 @@ public class AgentCompteur extends Agent {
                         reply.setPerformative(ACLMessage.INFORM);
                         reply.setContent(String.valueOf(pheromone.get(typeSource)));
                         send(reply);
-
+                        System.out.println(getLocalName()+" : Valeur de phéromone "+pheromone.get(typeSource));
                     }else { //Inc ou Dec
 
                     }

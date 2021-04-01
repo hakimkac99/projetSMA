@@ -13,7 +13,7 @@ public class AgentAiguilleur extends Agent {
 
     @Override
     protected void setup() {
-        System.out.println("Je suis "+getLocalName());
+        System.out.println(getLocalName()+" : Début d'exécution");
 
         //Recupérer l'argument (La machine)
         Object[] args = getArguments();
@@ -27,11 +27,10 @@ public class AgentAiguilleur extends Agent {
                 //Recevoir le message de l'agent mobile : le type de source à chercher
                 //Renvoyer la machine suivante
 
-                ACLMessage msg = myAgent.blockingReceive();
-                if (msg != null) {
-                    System.out.println("Jani message : "+msg);
+                ACLMessage msgRec = myAgent.blockingReceive();
+                if (msgRec != null) {
                     // Message received. Process it
-                    String typeSource = msg.getContent();
+                    String typeSource = msgRec.getContent();
                     //ACLMessage reply = msg.createReply();
 
                     //Contacter les agents compteurs des machines successeurs
@@ -39,7 +38,13 @@ public class AgentAiguilleur extends Agent {
                     String container =  contactCompteurs(typeSource,this);
 
                     //Renvoyer le container avec max pher à l'agent mobile
-                    System.out.println(container);
+
+                    ACLMessage reply = msgRec.createReply();
+                    reply.setPerformative(ACLMessage.INFORM);
+                    reply.setContent(container);
+                    send(reply);
+
+                    System.out.println(getLocalName()+" Chemin conseillé : "+container);
                 }
                 else{
                     block();
@@ -66,7 +71,7 @@ public class AgentAiguilleur extends Agent {
             msg.setContent("type "+typeSource);
             send(msg);
 
-            System.out.println(getLocalName()+" ; Envoie du message à : "+"Agent_Compteur_"+(machineSucc.getId()+1));
+            System.out.println(getLocalName()+" : demande de la valeur du pheromone à l'"+"Agent_Compteur_"+(machineSucc.getId()+1));
 
             //Attendre une réponse
 
@@ -75,7 +80,7 @@ public class AgentAiguilleur extends Agent {
             if (msgRec != null) {
                 // Message received. Process it
                 int pher = Integer.valueOf(msgRec.getContent());
-                System.out.println("Valeur du phéromone envoyé par le receveur "+(machineSucc.getId()+1)+" est : "+pher);
+                System.out.println(getLocalName()+" : Valeur du phéromone reçu par le compteur "+(machineSucc.getId()+1)+" est : "+pher);
 
                 //Select the max Pher
                 if (i==0){
