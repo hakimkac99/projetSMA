@@ -14,7 +14,9 @@ public class AgentLanceur extends Agent {
         Object[] args = getArguments();
         if (args != null) {
             machine = (VirtualMachine) args[0];
-            machine.AddAgentMobile("Image");
+            if(machine.getId()==8) {
+                machine.AddAgentMobile("Image");
+            }
         }
 
 

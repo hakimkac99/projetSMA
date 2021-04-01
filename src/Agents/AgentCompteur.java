@@ -13,8 +13,8 @@ public class AgentCompteur extends Agent {
     @Override
     protected void setup() {
         pheromone = new HashMap<>();
-        pheromone.put("image",0);
-        pheromone.put("texte",0);
+        pheromone.put("Image",0);
+        pheromone.put("Texte",0);
 
         System.out.println("Je suis "+getLocalName());
 
@@ -22,11 +22,21 @@ public class AgentCompteur extends Agent {
             @Override
             public void action() {
                 //Attendre un message
-                ACLMessage msgRec = myAgent.receive();
+                ACLMessage msgRec = myAgent.blockingReceive();
                 if (msgRec != null) {
                     // Message received. Process it
-                    System.out.println(msgRec.getContent());
 
+                    if(msgRec.getContent().contains("type ")){
+                        String typeSource = msgRec.getContent().substring(5);
+                        //retourner le pheromone
+                        ACLMessage reply = msgRec.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+                        reply.setContent(String.valueOf(pheromone.get(typeSource)));
+                        send(reply);
+
+                    }else { //Inc ou Dec
+
+                    }
 
                 }
             }
