@@ -198,7 +198,7 @@ public class AgentMobile extends Agent {
         msg.setOntology("Search");
         msg.setContent(action);
         send(msg);
-        System.out.println(getLocalName()+" : Envoie de l'action à l'Agent_Compteur_"+actualId);
+        //System.out.println(getLocalName()+" : Envoie de l'action à l'Agent_Compteur_"+actualId);
 
         //Etape 2
         ACLMessage msgRec = null;
@@ -207,13 +207,13 @@ public class AgentMobile extends Agent {
             msgRec = receive();
             if (msgRec != null) {
                 if (msgRec.getContent().equals("ActionOK")) {
-                    System.out.println(getLocalName() + " : Recevoir de message ActionOK de l'Agent_Compteur_" + actualId);
+                    //System.out.println(getLocalName() + " : Recevoir de message ActionOK de l'Agent_Compteur_" + actualId);
                     //Etape 3
                     ACLMessage msgType = new ACLMessage(ACLMessage.INFORM);
                     msgType.addReceiver(new AID("Agent_Compteur_" + actualId, AID.ISLOCALNAME));
                     msgType.setContent(typeSource);
                     send(msgType);
-                    System.out.println(getLocalName() + " : Envoie de type de message à l'Agent_Compteur_" + actualId);
+                    //System.out.println(getLocalName() + " : Envoie de type de message à l'Agent_Compteur_" + actualId);
 
                     //Etape 4
                     msgRec =null;
@@ -221,7 +221,7 @@ public class AgentMobile extends Agent {
                         msgRec = receive();
                         if (msgRec != null) {
                             if (msgRec.getContent().equals("TypeOK")) {
-                                System.out.println(getLocalName() + " : Recevoir de message TypeOK de l'Agent_Compteur_" + actualId);
+                                //System.out.println(getLocalName() + " : Recevoir de message TypeOK de l'Agent_Compteur_" + actualId);
                             }
                         }
                     }
@@ -246,7 +246,7 @@ public class AgentMobile extends Agent {
 
             if (msgRec != null) {
                 if (msgRec.getContent().equals("OK")) {
-                    System.out.println(getLocalName()+" : recevoir OK");
+                    //System.out.println(getLocalName()+" : recevoir OK");
                     ACLMessage reply = msgRec.createReply();
                     reply.setPerformative(ACLMessage.INFORM);
                     reply.setContent(cheminParcour.toString());

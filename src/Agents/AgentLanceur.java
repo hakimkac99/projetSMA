@@ -121,9 +121,6 @@ public class AgentLanceur extends Agent {
         l.setHorizontalAlignment(JTextField.CENTER);
 
 
-
-
-
         f.add(tf);
         f.add(b);//adding button in JFrame
         f.add(l);
@@ -160,7 +157,11 @@ public class AgentLanceur extends Agent {
 
         JLabel l = new JLabel(text);
         l.setBounds(0,(indexLabel*20),400, 40);
+
+
         l.setForeground(Color.BLUE);
+
+
         l.setFont(new Font("SansSerif", Font.BOLD, 15));
         l.setHorizontalAlignment(JTextField.CENTER);
         logPanel.add(l);
