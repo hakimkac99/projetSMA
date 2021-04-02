@@ -31,13 +31,7 @@ public class AgentLanceur extends Agent {
         Object[] args = getArguments();
         if (args != null) {
             machine = (VirtualMachine) args[0];
-
-
-
-            if(machine.getId()==8) {
-                initGUI();
-
-            }
+            initGUI();
         }
 
         addBehaviour(new CyclicBehaviour() {
@@ -58,6 +52,9 @@ public class AgentLanceur extends Agent {
                             System.out.println(getLocalName()+" : "+msgRec.getSender().getLocalName()+" a trouvé la source de donnée");
 
                             addLabelToGUI("Source de données trouvée");
+                            addLabelToGUI("Chemin parcouru : ");
+                            receiveChemin(msgRec);
+
                             typeSearch=null;
                             indexLabel=0;
                             iteration=0;
@@ -68,6 +65,8 @@ public class AgentLanceur extends Agent {
                             System.out.println(getLocalName()+" : "+msgRec.getSender().getLocalName()+" n'a pas trouvé la source de donnée");
 
                             addLabelToGUI("Source de données non trouvée");
+                            addLabelToGUI("Chemin parcouru : ");
+                            receiveChemin(msgRec);
 
                             //Lancer un autre agent
                             System.out.println(getLocalName()+" : "+msgRec.getSender().getLocalName()+" Lancer un autre agent mobile pour faire la recherche");
@@ -77,11 +76,29 @@ public class AgentLanceur extends Agent {
 
                 }
 
+
+
             }
         });
 
 
 
+    }
+
+    void receiveChemin(ACLMessage msgRec){
+        ACLMessage reply = msgRec.createReply();
+        reply.setPerformative(ACLMessage.INFORM);
+        reply.setContent("OK");
+        send(reply);
+        //Attendre le chemin
+        ACLMessage msgChemin= null;
+        while(msgChemin==null) {
+            msgChemin = receive();
+
+            if (msgChemin != null) {
+                addLabelToGUI(msgChemin.getContent());
+            }
+        }
     }
 
     private void initGUI(){

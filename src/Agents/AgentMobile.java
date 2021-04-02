@@ -14,7 +14,8 @@ public class AgentMobile extends Agent {
     int idMachineOrigine;
     int actualId;
     String typeSource;
-    ArrayList<String>chemin;
+    ArrayList<String> cheminProcess;
+    ArrayList<String>cheminParcour;
     String etat = "PROCESS"; // etat : {PROCESS,FOUND,NOTFOUND}
 
     @Override
@@ -30,8 +31,8 @@ public class AgentMobile extends Agent {
             actualId = idMachineOrigine;
         }
 
-        chemin = new ArrayList<>();
-
+        cheminProcess = new ArrayList<>();
+        cheminParcour = new ArrayList<>();
 
         addBehaviour(new CyclicBehaviour() {
             @Override
@@ -39,8 +40,8 @@ public class AgentMobile extends Agent {
 
                     switch (etat){
                         case "PROCESS": {
-                            chemin.add("Container-" + actualId);
-
+                            cheminProcess.add("Container-" + actualId);
+                            cheminParcour.add("Container-" + actualId);
                             String receiver = "Agent_Aiguilleur_" + actualId;
 
                             System.out.println(getLocalName() + " : demande du meilleur chemin à l'" + receiver);
@@ -87,9 +88,9 @@ public class AgentMobile extends Agent {
 
                             //move back and increment pheromone
 
-                            chemin.remove(chemin.size() - 1);
+                            cheminProcess.remove(cheminProcess.size() - 1);
 
-                            String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
+                            String containerName = cheminProcess.get(cheminProcess.size() - 1); //Last container (Conteneur précedant)
 
                             ContainerID destination = new ContainerID();
                             // Initialize the destination object
@@ -100,7 +101,7 @@ public class AgentMobile extends Agent {
 
                             doMove(destination);
 
-                            if (chemin.size() > 1) {
+                            if (cheminProcess.size() > 1) {
                                 System.out.println(getLocalName() + " : Nouvelle localisation : " + containerName);
                                 System.out.println(getLocalName() + " : Demander l'incrémentation du pheromone à l'Agent_Compteur_" + actualId);
                                 contactCompteur("Inc", this);
@@ -109,6 +110,7 @@ public class AgentMobile extends Agent {
                                 System.out.println(getLocalName() + " : Nouvelle localisation : (machine origine) "+containerName);
 
                                 contactLanceur();
+                                doDelete();
                             }
 
                             break;
@@ -117,9 +119,9 @@ public class AgentMobile extends Agent {
 
                             //move back
 
-                            chemin.remove(chemin.size() - 1);
+                            cheminProcess.remove(cheminProcess.size() - 1);
 
-                            String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
+                            String containerName = cheminProcess.get(cheminProcess.size() - 1); //Last container (Conteneur précedant)
 
                             ContainerID destination = new ContainerID();
                             // Initialize the destination object
@@ -130,13 +132,14 @@ public class AgentMobile extends Agent {
 
                             doMove(destination);
 
-                            if (chemin.size() > 1) {
+                            if (cheminProcess.size() > 1) {
                                 System.out.println(getLocalName() + " : Nouvelle localisation :  " + containerName);
 
                             } else {
                                 System.out.println(getLocalName() + " : Nouvelle localisation (Machine origine) : "+containerName);
 
                                 contactLanceur();
+                                doDelete();
 
                             }
                             break;
@@ -236,7 +239,24 @@ public class AgentMobile extends Agent {
         send(msg);
         System.out.println(getLocalName()+" : Informer l'Agent_Lanceur_"+actualId+" que la recherche est terminée");
 
-        doDelete();
+
+        ACLMessage msgRec= null;
+        while(msgRec==null) {
+            msgRec = receive();
+
+            if (msgRec != null) {
+                if (msgRec.getContent().equals("OK")) {
+                    System.out.println(getLocalName()+" : recevoir OK");
+                    ACLMessage reply = msgRec.createReply();
+                    reply.setPerformative(ACLMessage.INFORM);
+                    reply.setContent(cheminParcour.toString());
+                    send(reply);
+                    doDelete();
+                }
+            }
+        }
+
+
     }
 
 }
