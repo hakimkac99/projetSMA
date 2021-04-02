@@ -59,9 +59,10 @@ public class AgentCompteur extends Agent {
                             else
                                 decPheromone(typeSearch);
 
-                            System.out.println(getLocalName()+" : Nouvelle valeur du phéromone "+getPheromone(typeSearch));
                             reply.setContent("TypeOK");
                             send(reply);
+
+                            System.out.println(getLocalName()+" : Nouvelle valeur du phéromone "+getPheromone(typeSearch));
                         }else{
                             block();
                         }

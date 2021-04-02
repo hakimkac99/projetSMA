@@ -4,31 +4,30 @@ import jade.core.AID;
 import jade.core.Agent;
 import jade.core.ContainerID;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
-import main.VirtualMachine;
 
 import java.util.ArrayList;
 
 //Fourmi
 public class AgentMobile extends Agent {
 
-    int idMachineSource;
+    int idMachineOrigine;
     int actualId;
     String typeSource;
     ArrayList<String>chemin;
-    String etat = "PROCESS"; // etat : {PROCESS,FOUND,NOTFOUND,IDLE}
+    String etat = "PROCESS"; // etat : {PROCESS,FOUND,NOTFOUND}
 
     @Override
     protected void setup() {
+        System.out.println("\n\n\n\n\n\n********************");
         System.out.println(getLocalName()+" : Début d'exécution");
 
         //Recupérer l'argument (La machine)
         Object[] args = getArguments();
         if (args != null) {
-            idMachineSource = (int) args[0]+1;
+            idMachineOrigine = (int) args[0]+1;
             typeSource = (String) args[1];
-            actualId = idMachineSource;
+            actualId = idMachineOrigine;
         }
 
         chemin = new ArrayList<>();
@@ -38,114 +37,111 @@ public class AgentMobile extends Agent {
             @Override
             public void action() {
 
+                    switch (etat){
+                        case "PROCESS": {
+                            chemin.add("Container-" + actualId);
+
+                            String receiver = "Agent_Aiguilleur_" + actualId;
+
+                            System.out.println(getLocalName() + " : demande du meilleur chemin à l'" + receiver);
+
+                            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                            msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
+                            msg.setLanguage("English");
+                            msg.setOntology("Search");
+                            msg.setContent(typeSource);
+                            send(msg);
+
+                            //Recevoir le conteneur avec max pher
+                            String containerName = null;
+                            ACLMessage msgRec = blockingReceive();
+                            if (msgRec != null) {
+                                if (msgRec.getContent().equals("Source")) {
+                                    //if data source machine Cantact AgentReceveur
+                                    System.out.println(getLocalName() + " : Je suis à la source");
+                                    contactReceveur(this);
+
+                                } else {
+                                    //Else (receive a container name) then move
+
+                                    containerName = msgRec.getContent();
+                                    System.out.println(getLocalName() + " : " + containerName + " choisi");
+                                    //mobility
+                                    ContainerID destination = new ContainerID();
+                                    // Initialize the destination object
+                                    destination.setName(containerName);
+                                    // Change of the agent state to move
+                                    actualId = Integer.valueOf(containerName.substring(10));
+
+                                    myAgent.doMove(destination);
+                                    System.out.println(getLocalName() + " : Nouvelle Localisation " + containerName);
+                                }
+                            } else {
+                                block();
+                            }
 
 
-                    if (etat.equals("PROCESS")){
-                        chemin.add("Container-" + actualId);
+                            break;
+                        }
+                        case "FOUND": {
 
+                            //move back and increment pheromone
 
-                        String receiver = "Agent_Aiguilleur_" + actualId;
+                            chemin.remove(chemin.size() - 1);
 
-                        System.out.println(getLocalName() + " : demande du meilleur chemin à l'" + receiver);
+                            String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
 
-                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                        msg.addReceiver(new AID(receiver, AID.ISLOCALNAME));
-                        msg.setLanguage("English");
-                        msg.setOntology("Search");
-                        msg.setContent(typeSource);
-                        send(msg);
+                            ContainerID destination = new ContainerID();
+                            // Initialize the destination object
 
-                        //Recevoir le conteneur avec max pher
-                        String containerName = null;
-                        ACLMessage msgRec = blockingReceive();
-                        if (msgRec != null) {
-                            if (msgRec.getContent().equals("Source")) {
-                                //if data source machine Cantact AgentReceveur
-                                System.out.println(getLocalName() + " : Je suis à la source");
-                                contactReceveur(this);
+                            destination.setName(containerName);
+                            // Change of the agent state to move
+                            actualId = Integer.valueOf(containerName.substring(10));
+
+                            doMove(destination);
+
+                            if (chemin.size() > 1) {
+                                System.out.println(getLocalName() + " : Nouvelle localisation : " + containerName);
+                                System.out.println(getLocalName() + " : Demander l'incrémentation du pheromone à l'Agent_Compteur_" + actualId);
+                                contactCompteur("Inc", this);
 
                             } else {
-                                //Else (receive a container name) then move
+                                System.out.println(getLocalName() + " : Nouvelle localisation : (machine origine) "+containerName);
 
-                                containerName = msgRec.getContent();
-                                System.out.println(getLocalName() + " : " + containerName + " choisi");
-                                //mobility
-                                ContainerID destination = new ContainerID();
-                                // Initialize the destination object
-                                destination.setName(containerName);
-                                // Change of the agent state to move
-                                actualId = Integer.valueOf(containerName.substring(10));
-
-                                myAgent.doMove(destination);
-                                System.out.println(getLocalName() + " : je suis à la machine " + containerName);
+                                contactLanceur();
                             }
-                        } else {
-                            block();
+
+                            break;
                         }
+                        case "NOTFOUND": {
 
+                            //move back
 
-                    }
-                    if (etat.equals("FOUND")) {
-                        //move back and increment pheromone
+                            chemin.remove(chemin.size() - 1);
 
-                        chemin.remove(chemin.size() - 1);
+                            String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
 
-                        String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
+                            ContainerID destination = new ContainerID();
+                            // Initialize the destination object
 
-                        ContainerID destination = new ContainerID();
-                        // Initialize the destination object
+                            destination.setName(containerName);
+                            // Change of the agent state to move
+                            actualId = Integer.valueOf(containerName.substring(10));
 
-                        destination.setName(containerName);
-                        // Change of the agent state to move
-                        actualId = Integer.valueOf(containerName.substring(10));
+                            doMove(destination);
 
-                        doMove(destination);
+                            if (chemin.size() > 1) {
+                                System.out.println(getLocalName() + " : Nouvelle localisation :  " + containerName);
 
-                        if (chemin.size() > 1) {
-                            System.out.println(getLocalName() + " : je suis à la machine " + containerName);
-                            System.out.println(getLocalName()+" : Demander l'incrémentation du pheromone à l'Agent_Compteur_"+actualId);
-                            contactCompteur("Inc",this);
+                            } else {
+                                System.out.println(getLocalName() + " : Nouvelle localisation (Machine origine) : "+containerName);
 
-                        } else {
-                            System.out.println(getLocalName() + " : je suis revenue à la machine origine");
-                            //Contact AgentLanceur
+                                contactLanceur();
 
-                            etat = "IDLE";
+                            }
+                            break;
                         }
-
                     }
-                    if (etat.equals("NOTFOUND")) {
-                        //move back
-
-                        chemin.remove(chemin.size() - 1);
-
-                        String containerName = chemin.get(chemin.size() - 1); //Last container (Conteneur précedant)
-
-                        ContainerID destination = new ContainerID();
-                        // Initialize the destination object
-
-                        destination.setName(containerName);
-                        // Change of the agent state to move
-                        actualId = Integer.valueOf(containerName.substring(10));
-
-                        doMove(destination);
-
-                        if (chemin.size() > 1) {
-                            System.out.println(getLocalName() + " : je suis à la machine " + containerName);
-
-                        } else {
-                            System.out.println(getLocalName() + " : je suis revenue a la machine origine");
-
-                            //Contact AgentLanceur
-                            etat = "IDLE";
-                        }
-
-                    }
-                    if (etat.equals("IDLE")){
-
-                    }
-
-
             }
         });
     }
@@ -163,7 +159,6 @@ public class AgentMobile extends Agent {
 
         //Attendre un message
         ACLMessage msgRec = blockingReceive();
-        System.out.println("******");
         if (msgRec != null) {
 
             if(msgRec.getContent().equals("Found")){
@@ -230,6 +225,18 @@ public class AgentMobile extends Agent {
                 }
             }
         }
+    }
+
+    private void contactLanceur(){
+        //Informer l'agent lanceur que la source est trouvée ou pas
+
+        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+        msg.addReceiver(new AID("Agent_Lanceur_"+actualId, AID.ISLOCALNAME));
+        msg.setContent(etat);
+        send(msg);
+        System.out.println(getLocalName()+" : Informer l'Agent_Lanceur_"+actualId+" que la recherche est terminée");
+
+        doDelete();
     }
 
 }
