@@ -43,7 +43,7 @@ public class AgentAiguilleur extends Agent {
                         //Contacter les agents compteurs des machines successeurs
                         String container = contactCompteurs(typeSource, this);
                         replyMessage = container;
-                        System.out.println(getLocalName()+" Chemin conseillé : "+container);
+                        System.out.println(getLocalName()+" : Chemin conseillé : "+container);
                     }
 
                     //Renvoyer le container avec max pher à l'agent mobile

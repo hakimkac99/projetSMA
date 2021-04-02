@@ -27,13 +27,14 @@ public class AgentReceveur extends Agent {
                     // Message of agentMobile received. Process it
                     String replyMessage = "";
                     String typeSearch = msgRec.getContent(); //Type à chercher par l'agent mobile
+                    //System.out.println(getLocalName()+" ; "+typeSearch+" ; "+machine.getDataSource());
                     if(typeSearch.equals(machine.getDataSource())){
 
-                        System.out.println(getLocalName()+" source de donnée trouvée");
+                        System.out.println(getLocalName()+" : source de donnée trouvée");
                         replyMessage = "Found";
 
                     }else{
-                        System.out.println(getLocalName()+" source de donnée non trouvée");
+                        System.out.println(getLocalName()+" : source de donnée non trouvée");
                         replyMessage = "NotFound";
                     }
 
@@ -45,6 +46,7 @@ public class AgentReceveur extends Agent {
                 }else{
                     block();
                 }
+
             }
         });
 

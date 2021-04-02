@@ -22,12 +22,14 @@ public class AgentCompteur extends Agent {
         addBehaviour(new CyclicBehaviour() {
             @Override
             public void action() {
+
                 //Attendre un message
                 ACLMessage msgRec = myAgent.blockingReceive();
                 if (msgRec != null) {
                     // Message received. Process it
 
                     if(msgRec.getContent().contains("type ")){
+                        //Get Pheromone
                         String typeSource = msgRec.getContent().substring(5);
                         //retourner le pheromone
                         ACLMessage reply = msgRec.createReply();
@@ -35,7 +37,34 @@ public class AgentCompteur extends Agent {
                         reply.setContent(String.valueOf(getPheromone(typeSource)));
                         send(reply);
                         System.out.println(getLocalName()+" : Valeur de phéromone "+getPheromone(typeSource));
-                    }else { //Inc ou Dec
+
+                    }else {
+                        //Inc ou Dec
+                        String action = msgRec.getContent();
+
+                        ACLMessage reply = msgRec.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+
+                        reply.setContent("ActionOK");
+
+                        send(reply);
+
+                        // recevoir le type
+                        String typeSearch="";
+                        ACLMessage msgType = myAgent.blockingReceive();
+                        if (msgType != null) {
+                            typeSearch = msgType.getContent();
+                            if (action.equals("Inc"))
+                                incPheromone(typeSearch);
+                            else
+                                decPheromone(typeSearch);
+
+                            System.out.println(getLocalName()+" : Nouvelle valeur du phéromone "+getPheromone(typeSearch));
+                            reply.setContent("TypeOK");
+                            send(reply);
+                        }else{
+                            block();
+                        }
 
                     }
 

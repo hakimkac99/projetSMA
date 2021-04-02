@@ -48,7 +48,7 @@ public class MainContainer {
         network.get(1).pred.add(network.get(3));
         network.get(1).pred.add(network.get(4));
         network.get(1).succ = null;
-        network.get(0).addDataSource("Text");
+        network.get(1).addDataSource("Image");
 
         network.get(2).pred.add(network.get(5));
         network.get(2).pred.add(network.get(6));
