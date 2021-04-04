@@ -43,7 +43,7 @@ public class AgentLanceur extends Agent {
                 }
 
                 addLabelToGUI("Itération "+(iteration+1));
-                System.out.println("Itération "+(iteration+1));
+                //System.out.println("Itération "+(iteration+1));
                 //Attendre un message
                 ACLMessage msgRec = blockingReceive();
                 if (msgRec != null) {
